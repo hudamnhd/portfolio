@@ -12,7 +12,7 @@ const sessionStorage = createCookieSessionStorage({
 		sameSite: "lax",
 		secrets: ["s3cr3t"],
 		// secure: true,
-		...(isProduction ? { domain: "my-website.com", secure: true } : {}), // 👈 Website URL.
+		...(isProduction ? { domain: "mhda.netlify.app", secure: true } : {}), // 👈 Website URL.
 	},
 });
 

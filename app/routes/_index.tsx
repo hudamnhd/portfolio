@@ -1,7 +1,5 @@
-import React from "react";
 import { Button, buttonVariants } from "#app/components/ui/button";
 import { Link } from "react-router";
-import { Badge } from "#app/components/ui/badge";
 import { cn } from "#app/utils/misc";
 import { Theme, useTheme } from "remix-themes";
 import { Sun, Moon } from "lucide-react";
