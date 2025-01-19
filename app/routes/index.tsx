@@ -1,10 +1,14 @@
 import { Button, buttonVariants } from "#app/components/ui/button";
-import { Link } from "react-router";
+import { useFetcher, Link, useRouteLoaderData } from "react-router";
 import { cn } from "#app/utils/misc";
-import { Theme, useTheme } from "remix-themes";
+type Theme = "light" | "dark";
 
 function ThemeSwitch() {
-	const [theme, setTheme] = useTheme();
+	const fetcher = useFetcher();
+
+	const loaderRootData = useRouteLoaderData("root");
+	const theme: Theme = loaderRootData?.requestInfo?.userPrefs?.theme || "light";
+	const path = loaderRootData?.requestInfo?.path;
 
 	const nextMode = theme === "light" ? "dark" : "light";
 	const modeLabel = {
@@ -52,16 +56,21 @@ function ThemeSwitch() {
 
 	return (
 		<>
-			{theme && (
-				<Button
-					onClick={() => setTheme(nextMode as Theme)}
-					title="Change theme"
-					variant="ghost"
-					size="icon"
-				>
-					{modeLabel[theme]}
-				</Button>
-			)}
+			<pre className="text-sm">{JSON.stringify(fetcher.data, null, 2)}</pre>
+			<fetcher.Form action="/action/set-theme" method="POST">
+				<input type="hidden" name="redirectTo" value={path} />
+				<input type="hidden" name="theme" value={nextMode} />
+				<div className="flex gap-2">
+					<Button
+						type="submit"
+						title="Change theme"
+						variant="ghost"
+						size="icon"
+					>
+						{modeLabel[theme]}
+					</Button>
+				</div>
+			</fetcher.Form>
 		</>
 	);
 }

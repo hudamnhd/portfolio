@@ -9,35 +9,28 @@ import {
 } from "react-router";
 import type { Route } from "./+types/root";
 import stylesheet from "./app.css?url";
-import {
-	ThemeProvider,
-	useTheme,
-	PreventFlashOnWrongTheme,
-} from "remix-themes";
-import { themeSessionResolver } from "./utils/sessions.server";
+import { type Theme, getTheme } from "./utils/theme.server";
 
+export const meta: Route.MetaFunction = ({ data }) => {
+	return [
+		{ title: data ? "Huda Site" : "Error | Huda Site" },
+		{ name: "description", content: `Portfolio site` },
+	];
+};
 // Return the theme from the session storage using the loader
 export async function loader({ request }: Route.LoaderArgs) {
-	const { getTheme } = await themeSessionResolver(request);
 	return {
-		theme: getTheme(),
+		requestInfo: {
+			path: new URL(request.url).pathname,
+			userPrefs: {
+				theme: getTheme(request) as Theme,
+			},
+		},
 	};
 }
 
-// Wrap your app with ThemeProvider.
-// `specifiedTheme` is the stored theme in the session storage.
-// `themeAction` is the action name that's used to change the theme in the session storage.
 export default function AppWithProviders() {
-	const data = useLoaderData();
-	return (
-		<ThemeProvider
-			specifiedTheme={data.theme}
-			themeAction="/action/set-theme"
-			disableTransitionOnThemeChange={true}
-		>
-			<App />
-		</ThemeProvider>
-	);
+	return <App />;
 }
 export const links: Route.LinksFunction = () => [
 	{ rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -55,14 +48,14 @@ export const links: Route.LinksFunction = () => [
 
 function App() {
 	const data = useLoaderData();
-	const [theme] = useTheme();
+	const theme = data?.requestInfo?.userPrefs?.theme || "light";
+
 	return (
 		<html lang="en" data-theme={theme ?? ""} className={`${theme}`}>
 			<head>
 				<meta charSet="utf-8" />
 				<meta name="viewport" content="width=device-width, initial-scale=1" />
 				<Meta />
-				<PreventFlashOnWrongTheme ssrTheme={Boolean(data.theme)} />
 				<Links />
 			</head>
 			<body>
