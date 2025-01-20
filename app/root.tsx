@@ -17,6 +17,7 @@ export const meta: Route.MetaFunction = ({ data }) => {
 		{ name: "description", content: `Portfolio site` },
 	];
 };
+
 // Return the theme from the session storage using the loader
 export async function loader({ request }: Route.LoaderArgs) {
 	return {

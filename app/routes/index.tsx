@@ -1,79 +1,9 @@
-import { Button, buttonVariants } from "#app/components/ui/button";
-import { useFetcher, Link, useRouteLoaderData } from "react-router";
+import { buttonVariants } from "#app/components/ui/button";
+import { Link } from "react-router";
+import React from "react";
 import { cn } from "#app/utils/misc";
-type Theme = "light" | "dark";
-
-function ThemeSwitch() {
-	const fetcher = useFetcher();
-
-	const loaderRootData = useRouteLoaderData("root");
-	const theme: Theme = loaderRootData?.requestInfo?.userPrefs?.theme || "light";
-	const path = loaderRootData?.requestInfo?.path;
-
-	const nextMode = theme === "light" ? "dark" : "light";
-	const modeLabel = {
-		light: (
-			<svg
-				xmlns="http://www.w3.org/2000/svg"
-				width="24"
-				height="24"
-				viewBox="0 0 24 24"
-				fill="none"
-				stroke="currentColor"
-				strokeWidth="2"
-				strokeLinecap="round"
-				strokeLinejoin="round"
-				className="lucide lucide-sun"
-			>
-				<circle cx="12" cy="12" r="4" />
-				<path d="M12 2v2" />
-				<path d="M12 20v2" />
-				<path d="m4.93 4.93 1.41 1.41" />
-				<path d="m17.66 17.66 1.41 1.41" />
-				<path d="M2 12h2" />
-				<path d="M20 12h2" />
-				<path d="m6.34 17.66-1.41 1.41" />
-				<path d="m19.07 4.93-1.41 1.41" />
-			</svg>
-		),
-		dark: (
-			<svg
-				xmlns="http://www.w3.org/2000/svg"
-				width="24"
-				height="24"
-				viewBox="0 0 24 24"
-				fill="none"
-				stroke="currentColor"
-				strokeWidth="2"
-				strokeLinecap="round"
-				strokeLinejoin="round"
-				className="lucide lucide-moon"
-			>
-				<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
-			</svg>
-		),
-	};
-
-	return (
-		<>
-			<pre className="text-sm">{JSON.stringify(fetcher.data, null, 2)}</pre>
-			<fetcher.Form action="/action/set-theme" method="POST">
-				<input type="hidden" name="redirectTo" value={path} />
-				<input type="hidden" name="theme" value={nextMode} />
-				<div className="flex gap-2">
-					<Button
-						type="submit"
-						title="Change theme"
-						variant="ghost"
-						size="icon"
-					>
-						{modeLabel[theme]}
-					</Button>
-				</div>
-			</fetcher.Form>
-		</>
-	);
-}
+import { ThemeSwitch } from "./set-theme";
+import { colors2 } from "#app/utils/color";
 
 const RouteIndex = () => {
 	return (
@@ -185,4 +115,135 @@ const RouteIndex = () => {
 	);
 };
 
+const preBismillah = {
+	translation: {
+		id: "Dengan nama Allah",
+	},
+};
+
+const getContrastRatio = (hex1: string, hex2: string): number => {
+	const hexToRgb = (hex: string) => {
+		const bigint = parseInt(hex.replace("#", ""), 16);
+		return [(bigint >> 16) & 255, (bigint >> 8) & 255, bigint & 255];
+	};
+
+	const luminance = (r: number, g: number, b: number) => {
+		const [rr, gg, bb] = [r, g, b].map((channel) => {
+			const value = channel / 255;
+			return value <= 0.03928
+				? value / 12.92
+				: Math.pow((value + 0.055) / 1.055, 2.4);
+		});
+		return 0.2126 * rr + 0.7152 * gg + 0.0722 * bb;
+	};
+
+	const rgb1 = hexToRgb(hex1);
+	const rgb2 = hexToRgb(hex2);
+
+	const lum1 = luminance(rgb1[0], rgb1[1], rgb1[2]);
+	const lum2 = luminance(rgb2[0], rgb2[1], rgb2[2]);
+
+	return (Math.max(lum1, lum2) + 0.05) / (Math.min(lum1, lum2) + 0.05);
+};
+
+const RenderColors: React.FC<{
+	colors: typeof colors2;
+	scale: number;
+	backgroundColor: string;
+}> = ({ colors, scale, backgroundColor }) => {
+	const renderByScale = (
+		colors: typeof colors2,
+		scale: number,
+		backgroundColor: string,
+	) => {
+		const keys = Object.keys(colors);
+		return keys.map((key) => {
+			const foundColor = colors[key].find((item) => item.scale === scale);
+			if (foundColor) {
+				const contrastRatio = getContrastRatio(foundColor.hex, backgroundColor);
+				return (
+					<pre
+						key={`${key}-${scale}`}
+						className="whitespace-pre-wrap p-2"
+						style={{ color: foundColor.hex }}
+					>
+						{foundColor.hex} - {contrastRatio.toFixed(2)}
+						{/*{JSON.stringify({ x: contrastRatio.toFixed(2) }, null, 2)}*/}
+						{/*{JSON.stringify({ [key]: foundColor.hex }, null, 2)}*/}
+						{/*{JSON.stringify(preBismillah.translation.id, null, 2)}*/}
+					</pre>
+				);
+			}
+			return null;
+		});
+	};
+
+	return (
+		<div>
+			<div className="font-bold">{scale}</div>
+			<div>{renderByScale(colors, scale, backgroundColor)}</div>
+		</div>
+	);
+};
+
+// Component to display color previews
+const ContrastChecker: React.FC = () => {
+	const backgroundColor = "#FFFFF";
+	return (
+		<div style={{ backgroundColor }} className="grid grid-cols-10 gap-2 p-3">
+			<RenderColors
+				backgroundColor={backgroundColor}
+				colors={colors2}
+				scale={100}
+			/>
+			<RenderColors
+				backgroundColor={backgroundColor}
+				colors={colors2}
+				scale={200}
+			/>
+			<RenderColors
+				backgroundColor={backgroundColor}
+				colors={colors2}
+				scale={300}
+			/>
+			<RenderColors
+				backgroundColor={backgroundColor}
+				colors={colors2}
+				scale={400}
+			/>
+			<RenderColors
+				backgroundColor={backgroundColor}
+				colors={colors2}
+				scale={500}
+			/>
+			<RenderColors
+				backgroundColor={backgroundColor}
+				colors={colors2}
+				scale={600}
+			/>
+			<RenderColors
+				backgroundColor={backgroundColor}
+				colors={colors2}
+				scale={700}
+			/>
+			<RenderColors
+				backgroundColor={backgroundColor}
+				colors={colors2}
+				scale={800}
+			/>
+			<RenderColors
+				backgroundColor={backgroundColor}
+				colors={colors2}
+				scale={900}
+			/>
+			<RenderColors
+				backgroundColor={backgroundColor}
+				colors={colors2}
+				scale={950}
+			/>
+		</div>
+	);
+};
+
 export default RouteIndex;
+// export default ContrastChecker;
