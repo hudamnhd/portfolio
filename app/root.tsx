@@ -5,11 +5,14 @@ import {
 	Outlet,
 	Scripts,
 	ScrollRestoration,
-	useLoaderData,
 } from "react-router";
 import type { Route } from "./+types/root";
-import stylesheet from "./app.css?url";
-import { type Theme, getTheme } from "./utils/theme.server";
+import tailwindStyleSheetUrl from "#app/styles/tailwind.css?url"; // "~/styles/tailwind.css?url";
+import {
+	ThemeSwitcherSafeHTML,
+	ThemeSwitcherScript,
+} from "#app/components/custom/theme-switcher";
+import { GlobalPendingIndicator } from "#app/components/custom/global-pending-indicator";
 
 export const meta: Route.MetaFunction = ({ data }) => {
 	return [
@@ -23,16 +26,10 @@ export async function loader({ request }: Route.LoaderArgs) {
 	return {
 		requestInfo: {
 			path: new URL(request.url).pathname,
-			userPrefs: {
-				theme: getTheme(request) as Theme,
-			},
 		},
 	};
 }
 
-export default function AppWithProviders() {
-	return <App />;
-}
 export const links: Route.LinksFunction = () => [
 	{ rel: "preconnect", href: "https://fonts.googleapis.com" },
 	{
@@ -44,27 +41,34 @@ export const links: Route.LinksFunction = () => [
 		rel: "stylesheet",
 		href: "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap",
 	},
-	{ rel: "stylesheet", href: stylesheet },
+	{ rel: "stylesheet", href: tailwindStyleSheetUrl },
 ];
 
-function App() {
-	const data = useLoaderData();
-	const theme = data?.requestInfo?.userPrefs?.theme || "light";
-
+function App({ children }: { children: React.ReactNode }) {
 	return (
-		<html lang="en" data-theme={theme ?? ""} className={`${theme}`}>
+		<ThemeSwitcherSafeHTML lang="en">
 			<head>
 				<meta charSet="utf-8" />
 				<meta name="viewport" content="width=device-width, initial-scale=1" />
 				<Meta />
 				<Links />
+				<ThemeSwitcherScript />
 			</head>
 			<body>
-				<Outlet />
+				<GlobalPendingIndicator />
+				{children}
 				<ScrollRestoration />
 				<Scripts />
 			</body>
-		</html>
+		</ThemeSwitcherSafeHTML>
+	);
+}
+
+export default function Root() {
+	return (
+		<App>
+			<Outlet />
+		</App>
 	);
 }
 

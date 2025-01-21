@@ -1,55 +1,42 @@
 import { type Config } from "tailwindcss";
 
+function lightDarkVar(baseName: string) {
+	return `var(--theme-light, hsl(var(--${baseName}))) var(--theme-dark, hsl(var(--${baseName}-dark)))`;
+}
 export const extendedTheme = {
 	colors: {
-		border: "hsl(var(--border))",
-		input: {
-			DEFAULT: "hsl(var(--input))",
-			invalid: "hsl(var(--input-invalid))",
-		},
-		ring: {
-			DEFAULT: "hsl(var(--ring))",
-			invalid: "hsl(var(--foreground-destructive))",
-		},
-		background: "hsl(var(--background))",
-		foreground: {
-			DEFAULT: "hsl(var(--foreground))",
-			destructive: "hsl(var(--foreground-destructive))",
-		},
+		border: lightDarkVar("border"),
+		input: lightDarkVar("input"),
+		ring: lightDarkVar("ring"),
+		background: lightDarkVar("background"),
+		foreground: lightDarkVar("foreground"),
 		primary: {
-			DEFAULT: "hsl(var(--primary))",
-			foreground: "hsl(var(--primary-foreground))",
+			DEFAULT: lightDarkVar("primary"),
+			foreground: lightDarkVar("primary-foreground"),
 		},
 		secondary: {
-			DEFAULT: "hsl(var(--secondary))",
-			foreground: "hsl(var(--secondary-foreground))",
+			DEFAULT: lightDarkVar("secondary"),
+			foreground: lightDarkVar("secondary-foreground"),
 		},
 		destructive: {
-			DEFAULT: "hsl(var(--destructive))",
-			foreground: "hsl(var(--destructive-foreground))",
+			DEFAULT: lightDarkVar("destructive"),
+			foreground: lightDarkVar("destructive-foreground"),
 		},
 		muted: {
-			DEFAULT: "hsl(var(--muted))",
-			foreground: "hsl(var(--muted-foreground))",
+			DEFAULT: lightDarkVar("muted"),
+			foreground: lightDarkVar("muted-foreground"),
 		},
 		accent: {
-			DEFAULT: "hsl(var(--accent))",
-			foreground: "hsl(var(--accent-foreground))",
+			DEFAULT: lightDarkVar("accent"),
+			foreground: lightDarkVar("accent-foreground"),
 		},
 		popover: {
-			DEFAULT: "hsl(var(--popover))",
-			foreground: "hsl(var(--popover-foreground))",
+			DEFAULT: lightDarkVar("popover"),
+			foreground: lightDarkVar("popover-foreground"),
 		},
 		card: {
-			DEFAULT: "hsl(var(--card))",
-			foreground: "hsl(var(--card-foreground))",
-		},
-		chart: {
-			1: "hsl(var(--chart-1))",
-			2: "hsl(var(--chart-2))",
-			3: "hsl(var(--chart-3))",
-			4: "hsl(var(--chart-4))",
-			5: "hsl(var(--chart-5))",
+			DEFAULT: lightDarkVar("card"),
+			foreground: lightDarkVar("card-foreground"),
 		},
 	},
 	borderColor: {

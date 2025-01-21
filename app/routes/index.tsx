@@ -2,7 +2,7 @@ import { buttonVariants } from "#app/components/ui/button";
 import { Link } from "react-router";
 import React from "react";
 import { cn } from "#app/utils/misc";
-import { ThemeSwitch } from "./set-theme";
+import { ThemeSwitch } from "#app/components/custom/theme-switcher-button";
 import { colors2 } from "#app/utils/color";
 
 const RouteIndex = () => {

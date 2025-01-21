@@ -6,6 +6,6 @@ export default {
 	ssr: true,
 
 	future: {
-		unstable_optimizeDeps: true,
+		unstable_optimizeDeps: false,
 	},
 } satisfies Config;
